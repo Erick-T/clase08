@@ -5,10 +5,72 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Handlebars</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/js/bootstrap.min.js"
+        integrity="sha512-NWNl2ZLgVBoi6lTcMsHgCQyrZVFnSmcaa3zRv0L3aoGXshwoxkGs3esa9zwQHsChGRL4aLDnJjJJeP6MjPX46Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="./index.css">
+
 </head>
 
 <body>
+
+    <div>
+        <form action="/uploadfile" enctype="multipart/form-data" method="POST">
+            <label for="fname">Product Name</label>
+            <input type="text" id="pname" name="productNname" placeholder="Product name..">
+
+            <label for="lname">Product Price </label>
+            <input type="number" id="pprice" name="productPrice" placeholder="Product price..">
+
+            <label for="lname">Product Image</label>
+            <input type="text" id="pthumbnail" name="productImg" placeholder="Product thumbnail..">
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <span id="listaDeProductos"></span>
+
+    <script>
+        const socket = io();
+
+        const hbsTemplate = Handlebars.compile(`
+            <div>
+                <h1> Vista de Productos </h1>
+                {{#if productos}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th> Nombre </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each productos}}
+                        <tr>
+                            <td>
+                                {{title}}
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <h3>No hay productos.</h3>
+                {{/if}}
+            </div>
+        `);
+
+        socket.on('cargarProductos', productos => {
+            console.log(productos);
+            const html = hbsTemplate({ productos: productos });
+            document.getElementById('listaDeProductos').innerHTML = html
+        });
+    </script>
+
+
 
 </body>
 

@@ -1,10 +1,13 @@
 import express from 'express';
 import path from 'path';
-import { Productos } from './productos.mjs'
+import { Productos } from './productos.mjs';
+import handlebars from 'express-handlebars';
+import * as SocketIo from 'socket.io';
 
 const PORT = 8080;
 const app = express();
-const multer = require('multer');
+/* const cookieParser = require('cookie-parser'); */
+/* const multer = require('multer'); */
 const router = express.Router();
 const __dirname = path.resolve();
 const productoss = new Productos();
@@ -14,6 +17,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api', router);
 
+app.set('views', './views');
+app.set('view engine', 'hbs');
+
+app.engine('hbs',
+    handlebars({
+        extname: 'hbs',
+        defaultLayout: 'index.hbs',
+        layoutsDir: __dirname + 'views/layouts',
+        partialsDir: __dirname + '/views/partials'
+    })
+)
+
 const server = app.listen(PORT, () => {
     console.log(`server on ${PORT}`);
 });
@@ -21,6 +36,35 @@ const server = app.listen(PORT, () => {
 server.on('error', error => {
     console.log(error)
 })
+
+const io = new SocketIo.Server(server);
+app.get('/', (req, res) => {
+    res.sendFile(`${__dirname}/public/index.html`);
+})
+
+io.on('connection', socket => {
+    console.log('se conecto con el back')
+})
+
+/////////////////////
+
+
+
+/////////////////////
+
+/* const storage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        callback(null, "uploads");
+    },
+    filename: (request, file, callback) => {
+        callback(null, `${file.fieldname}${Date.now()}`);
+    },
+});
+
+const upload = multer({ sotrage: storage }); */
+
+/////////////////////
+
 
 // Rutas
 const pathListar = '/productos/listar';
@@ -95,8 +139,3 @@ router.delete(pathDelete, (req, res) => {
     }
 
 })
-
-
-
-
-
