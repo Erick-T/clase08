@@ -46,6 +46,7 @@ io.on('connection', socket => {
     console.log('se conecto con el back')
 })
 
+
 /////////////////////
 
 
@@ -76,6 +77,11 @@ const pathDelete = '/productos/borrar/:id';
 
 //////////////////////////////////////////////////////////////////////////
 
+router.get('/', (req, res) => {
+    response.render('index.ejs');
+})
+
+
 router.get(pathListar, (req, res) => {
     const result = productoss.getArray();
     if (result.length > 0) {
@@ -100,7 +106,9 @@ router.post(pathGuardar, (req, res) => {
     if (producto) {
         if (producto.title && producto.precio && producto.thumbnail) {
             productoss.addElement(producto)
-            res.status(200).send(producto)
+            /*   res.status(200).send(producto) */
+            res.redirect(`${__diraname}/public`);
+            res.render('listaProductos.ejs', { productos: productoss.getArray() });
         } else {
             res.status(404).send("Informacion incompleta.")
         }
